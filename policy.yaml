@@ -1,0 +1,37 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: match-cm
+  annotations:
+    policies.kyverno.io/category: Other
+    policies.kyverno.io/subject: ConfigMap
+spec:
+  background: false
+  validationFailureAction: audit
+  rules:
+  - name: match-cm-context
+    match:
+      any:
+      - resources:
+          kinds:
+          - ConfigMap
+    preconditions:
+      all:
+      - key: "{{request.object.metadata.namespace}}"
+        operator: AnyIn
+        value:
+        - "any-namespace"
+        - "another-namespace"
+      - key: "{{request.object.metadata.name}}"
+        operator: AnyIn
+        value:
+        - "any-configmap-name-good"
+        - "another-configmap-name"
+    validate:
+      message: "{{foo}} value doesn't match"
+      deny:
+        conditions:
+          all:
+          - key: "{{foo}}"
+            operator: AnyIn
+            value: bar
