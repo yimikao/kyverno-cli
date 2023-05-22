@@ -33,5 +33,5 @@ spec:
         conditions:
           all:
           - key: "{{foo}}"
-            operator: AnyIn
+            operator: Equals
             value: bar
